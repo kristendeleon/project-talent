@@ -18,8 +18,9 @@ export default class EmployeeProfile extends React.Component {
             employerData: {
                 skills: []
             },
-            formErrors: { name: '', email: '' },
-            nameValid: false,
+            formErrors: { firstName: '', lastName: '', email: '' },
+            firstNameValid: false,
+            lastNameValid: false,
             emailValid: false,
             formValid: true,
             loaderData: loaderData
@@ -46,7 +47,7 @@ export default class EmployeeProfile extends React.Component {
     }
 
     componentDidMount() {
-        this.loadData()
+        this.loadData();
     }
 
     loadData() {
@@ -63,27 +64,26 @@ export default class EmployeeProfile extends React.Component {
             success: function (res) {
                 let employerData = null;
                 if (res.employer) {
-                    employerData = res.employer
-                    //console.log("employerData", employerData)
+                    employerData = res.employer;
                 }
-                this.updateWithoutSave(employerData)
+                this.updateWithoutSave(employerData);
             }.bind(this),
             error: function (res) {
-                console.log(res.status)
+                console.log(res.status);
             }
         }) 
-        this.init()
+        this.init();
     }
 
     updateForComponentId(componentId, newValues) {
         let data = {};
         data[componentId] = newValues;
-        this.updateAndSaveData(data)
+        this.updateAndSaveData(data);
     }
 
     //updates component's state without saving data
     updateWithoutSave(newData) {
-        let newSD = Object.assign({}, this.state.employerData, newData)
+        let newSD = Object.assign({}, this.state.employerData, newData);
         this.setState({
             employerData: newSD
         })
@@ -91,7 +91,7 @@ export default class EmployeeProfile extends React.Component {
 
     //updates component's state and saves data
     updateAndSaveData(newData) {
-        let newSD = Object.assign({}, this.state.employerData, newData)
+        let newSD = Object.assign({}, this.state.employerData, newData);
         this.setState({
             employerData: newSD
         }, this.saveData)
@@ -117,7 +117,8 @@ export default class EmployeeProfile extends React.Component {
 
         let fieldValidationErrors = this.state.formErrors;
         let emailValid = this.state.emailValid;
-        let nameValid = this.state.nameValid;
+        let firstNameValid = this.state.firstNameValid;
+        let lastNameValid = this.state.lastNameValid;
         var formValid = this.state.formValid;
         switch (fieldName) {
             case 'email':
@@ -125,10 +126,15 @@ export default class EmployeeProfile extends React.Component {
                 fieldValidationErrors.email = emailValid ? '' : ' is invalid';
                 formValid = emailValid != null;
                 break;
-            case 'name':
-                nameValid = value.match('\w');
-                fieldValidationErrors.nameValid = nameValid ? '' : ' is invalid';
-                formValid = nameValid;
+            case 'firstName':
+                firstNameValid = value.match('\w');
+                fieldValidationErrors.firstName = firstNameValid ? '' : ' is invalid';
+                formValid = firstNameValid;
+                break;
+            case 'lastName':
+                lastNameValid = value.match('\w');
+                fieldValidationErrors.lastName = lastNameValid ? '' : ' is invalid';
+                formValid = lastNameValid;
                 break;
             default:
                 break;
@@ -136,7 +142,8 @@ export default class EmployeeProfile extends React.Component {
         this.setState({
             formErrors: fieldValidationErrors,
             emailValid: emailValid,
-            nameValid: nameValid,
+            firstNameValid: firstNameValid,
+            lastNameValid: lastNameValid,
             formValid: formValid
         }, this.validateForm);
     }
