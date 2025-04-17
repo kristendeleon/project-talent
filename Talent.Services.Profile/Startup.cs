@@ -39,15 +39,17 @@ namespace Talent.Services.Profile
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowWebAppAccess", builder =>
                 {
                     builder
-                        .WithOrigins("http://localhost:61772","http://localhost:60998") // Specify your allowed origins here
+                        .WithOrigins("https://project-talent-d6dcgnbgc5f0ebg8.eastus-01.azurewebsites.net") // Specify your allowed origins here
+                        //.AllowAnyOrigin()
                         .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .AllowCredentials();  
+                        .AllowAnyHeader();
+                          
                 });
             });
 
