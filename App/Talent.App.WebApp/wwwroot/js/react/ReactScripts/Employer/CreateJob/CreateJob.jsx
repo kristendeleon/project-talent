@@ -66,8 +66,8 @@ export default class CreateJob extends React.Component {
         var copyJobParam = this.props.match.params.copyId ? this.props.match.params.copyId : "";
 
         if (param != "" || copyJobParam != "") {
-            var link = param != "" ? 'http://localhost:51689/listing/listing/GetJobByToEdit?id=' + param
-                : 'http://localhost:51689/listing/listing/GetJobForCopy?id=' + copyJobParam;
+            var link = param != "" ? `${process.env.REACT_APP_API_LISTING}/listing/listing/GetJobByToEdit?id=` + param
+                : `${process.env.REACT_APP_API_LISTING}/listing/listing/GetJobForCopy?id=` + copyJobParam;
             var cookies = Cookies.get('talentAuthToken');
             $.ajax({
                 url: link,
@@ -127,7 +127,6 @@ export default class CreateJob extends React.Component {
         this.setState({
             jobData:data
         })
-        console.log(data);
     }
    
     render() {

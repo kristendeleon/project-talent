@@ -7,19 +7,20 @@ import { JobSummaryCard } from './JobSummaryCard.jsx';
 import { BodyWrapper, loaderData } from '../../Layout/BodyWrapper.jsx';
 import { Pagination, Icon, Dropdown, Checkbox, Accordion, Form, Segment } from 'semantic-ui-react';
 
-export default class ManageJob extends React.Component {
+export default class ManageJob extends React.Component {    
     constructor(props) {
         super(props);
         let loader = loaderData
         loader.allowedUsers.push("Employer");
         loader.allowedUsers.push("Recruiter");
-        //console.log(loader)
         this.state = {
             loadJobs: [],
             loaderData: loader,
-            activePage: 1,
+            activePage: {
+                activePage: 1,
+            },
             sortBy: {
-                date: "desc"
+                sortbydate: "desc",
             },
             filter: {
                 showActive: true,
@@ -28,57 +29,120 @@ export default class ManageJob extends React.Component {
                 showExpired: true,
                 showUnexpired: true
             },
-            totalPages: 1,
-            activeIndex: ""
+            totalPages: 0,
+            activeIndex: "",
+            isJobListEmpty: false
         }
         this.loadData = this.loadData.bind(this);
-        this.init = this.init.bind(this);
-        this.loadNewData = this.loadNewData.bind(this);
-        //your functions go here
+        this.fetchData = this.fetchData.bind(this);
+        this.renderJobsCards = this.renderJobsCards.bind(this);
+        this.handlePaginationChange = this.handlePaginationChange.bind(this); 
     };
-
-    init() {
-        let loaderData = TalentUtil.deepCopy(this.state.loaderData)
-        loaderData.isLoading = false;
-        this.setState({ loaderData });//comment this
-
-        //set loaderData.isLoading to false after getting data
-        //this.loadData(() =>
-        //    this.setState({ loaderData })
-        //)
-        
-        //console.log(this.state.loaderData)
-    }
 
     componentDidMount() {
-        this.init();
+        this.loadData();
     };
 
-    loadData(callback) {
-        var link = 'http://localhost:51689/listing/listing/getSortedEmployerJobs';
-        var cookies = Cookies.get('talentAuthToken');
-       // your ajax call and other logic goes here
+    fetchData() { 
+            let loaderData = TalentUtil.deepCopy(this.state.loaderData);
+            loaderData.isLoading = true;
+            const obj = Object.assign({},
+                this.state.filter,
+                this.state.sortBy,
+                this.state.activePage
+            );
+            var link = `${process.env.REACT_APP_API_LISTING}/listing/listing/getSortedEmployerJobs`;
+            var cookies = Cookies.get('talentAuthToken');
+        return new Promise((resolve, reject) => {
+
+           $.ajax({
+                url: link,
+                headers: {
+                    'Authorization': 'Bearer ' + cookies,
+                    'Content-Type': 'application/json'
+                },
+                data: obj,
+                type: "GET",
+                contentType: "application/json",
+                dataType: "json",
+
+                success: function (res) {
+                    if (res.myJobs) {
+                        if (res.myJobs.length == 0) {
+                            this.setState({ isJobListEmpty: true })
+                        }
+                        this.setState({ loadJobs: res.myJobs })
+                        this.setState({ totalPages: res.totalCount })
+                    }
+                    resolve(true);
+
+                }.bind(this),
+                error: function (res) {
+                    console.log(res);
+                    resolve(false);
+                }
+
+            });
+        })
+        
     }
 
-    loadNewData(data) {
-        var loader = this.state.loaderData;
-        loader.isLoading = true;
-        data[loaderData] = loader;
-        this.setState(data, () => {
-            this.loadData(() => {
-                loader.isLoading = false;
-                this.setState({
-                    loadData: loader
-                })
-            })
-        });
+    loadData() {
+        return this.fetchData().then(
+          this.setState((prevState) => {
+              Object.assign({}, prevState.loaderData.isLoading = false);
+          })            
+        )
+    }
+    renderJobsCards() {
+        const jobsList = this.state.loadJobs ? this.state.loadJobs : "";
+            return jobsList.map((job) => {
+                return (<JobSummaryCard key={job.id} job={job} />);
+            });
+        }
+    
+    handlePaginationChange(e, data) {
+        this.setState(prevState => Object.assign({}, prevState.activePage.activePage = data.activePage),
+            () => this.loadData());  
     }
 
     render() {
+        const itemsPerPage = 6;
+        const totalPages = Math.ceil(this.state.totalPages / itemsPerPage);
         return (
-            <BodyWrapper reload={this.init} loaderData={this.state.loaderData}>
-               <div className ="ui container">Your table goes here</div>
+            <BodyWrapper reload={this.loadData} loaderData={this.state.loaderData}>
+                <div className="ui container">
+                    <h1>List of Jobs</h1>
+                    <div className="filter-jobs">
+                    <Icon name='filter'></Icon>
+                    <span>Filter:</span>
+                    <Dropdown
+                            text='&nbsp;Choose filter'
+                            className="filter-dropdown"
+                     >
+                    </Dropdown>
+                    <Icon name='calendar alternate outline'></Icon>
+                    <span>Sort by date:</span>
+                    <Dropdown
+                            text='&nbsp;Newest first'
+                            className="filter-dropdown"
+                    >
+                    </Dropdown>
+                    </div>
+                    <div className="job-cards">
+                        {this.state.isJobListEmpty ? <p className="no-jobs-found">No Jobs Found</p> : this.renderJobsCards()}
+                    </div>
+                    
+                </div>
+                <div className="pagination">
+                <Pagination
+                        activePage={this.state.activePage.activePage}
+                        onPageChange={this.handlePaginationChange}
+                        totalPages={totalPages}
+                    />
+                </div>
+                
             </BodyWrapper>
         )
-    }
+    }   
 }
