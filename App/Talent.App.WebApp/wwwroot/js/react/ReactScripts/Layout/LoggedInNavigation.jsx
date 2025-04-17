@@ -18,8 +18,9 @@ export class LoggedInNavigation extends React.Component {
 
     isUserAuthenticated() {
         var cookies = Cookies.get('talentAuthToken');
+        const url = `${process.env.REACT_APP_API_PROFILE}/profile/profile/isUserAuthenticated`;
         $.ajax({
-            url: 'http://localhost:60290/profile/profile/isUserAuthenticated',
+            url: url,
             headers: {
                 'Authorization': 'Bearer ' + cookies,
                 'Content-Type': 'application/json'
@@ -153,7 +154,7 @@ export class LoggedInNavigation extends React.Component {
             default:
                 navdata = placeholder
         }
-
+        
         return (
             <NavigationBar data={navdata} />
         )

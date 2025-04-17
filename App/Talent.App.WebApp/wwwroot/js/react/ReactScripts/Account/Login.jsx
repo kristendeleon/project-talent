@@ -80,6 +80,7 @@ export default class LoginForm extends React.Component {
         return (error.length === 0 ? false : true);
     };
     login() {
+        const url = `${process.env.REACT_APP_API_IDENTITY}/authentication/authentication/signin`
         this.setState({ isLoading: true });
 
         var loginModel = {
@@ -89,7 +90,7 @@ export default class LoginForm extends React.Component {
         }
 
         $.ajax({
-            url: 'http://localhost:60998/authentication/authentication/signin',
+            url: url,
             type: 'POST',
             data: JSON.stringify(loginModel),
             contentType: 'application/json',
