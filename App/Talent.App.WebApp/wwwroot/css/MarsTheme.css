@@ -1460,4 +1460,54 @@ div.ReactTags__selected a.ReactTags__remove {
 .ui.dropdown.manage-jobs{
     margin-bottom: 10px;
 }
+
+.ui.dropdown.filter-dropdown > .dropdown.icon{
+    margin: 0;
+    margin-left: 2px;  
+}
+
+div.ui.dropdown.filter-dropdown{
+    font-weight:bold;
+}
+
+.job-cards{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.no-jobs-found {
+    padding-top: 15px;
+}
+.pagination{
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
 /*Manage jobs - End*/
+
+/*Job summary - start*/
+
+.job-cards .ui.card{
+   height: 300px;
+   width: 350px;
+   margin-top: 20px;
+   margin-bottom: 20px;
+   margin-right: 50px;
+   
+}
+
+.card-action-btn{
+    display: flex;
+    justify-content: space-between; 
+}
+
+.ui.red.button.card-btn {
+    padding: 0.5rem;
+  
+}
+.ui.button.card-btn {
+    font-size: 12px;
+}
+/*Job summary - end*/
